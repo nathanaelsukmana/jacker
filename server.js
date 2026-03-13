@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const puppeteer = require('puppeteer');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -115,6 +116,15 @@ app.post('/api/scrape', async (req, res) => {
         if (browser) await browser.close();
         res.status(500).json({ error: "Gagal mengambil data dari URL." });
     }
+});
+
+// --- MENAMPILKAN TAMPILAN WEBSITE (UI) ---
+// Menyediakan akses ke file statis (jika nanti ada CSS/Gambar tambahan)
+app.use(express.static(path.join(__dirname)));
+
+// Jika ada yang mengunjungi link utama ('/'), kirimkan file index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
