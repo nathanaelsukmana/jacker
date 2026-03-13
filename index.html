@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Jacker</title> 
     <style>
-        /* Desain UI Premium - Dasar */
         body { 
-            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            /* Menggunakan Helvetica Neue sesuai standar Off-White */
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
             margin: 0; 
-            padding: 40px 20px; 
+            padding: 20px; 
             background: linear-gradient(135deg, #ffffff 0%, #F6F4F0 100%); 
             min-height: 100vh;
             color: #333; 
@@ -20,8 +20,8 @@
             border-radius: 16px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.03); 
             border: 1px solid #f0eee9;
-            max-width: 1000px;
-            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box; 
         }
         .header-container { 
             text-align: center;
@@ -30,15 +30,19 @@
         .logo {
             height: 70px; 
             object-fit: contain;
-            margin-bottom: 10px;
+            margin-bottom: 5px; /* Jarak dirapatkan sedikit ke teks */
         }
-        .quote { 
-            font-style: italic; 
-            color: #888; 
+        
+        /* GAYA BARU: OFF-WHITE AESTHETIC */
+        .off-white-subtitle { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700; /* Bold */
+            color: #000000; /* Black pekat sesuai guidelines */
             margin-top: 0; 
-            font-size: 0.9em; 
-            letter-spacing: 1px;
+            font-size: 1.05rem; 
+            letter-spacing: -0.3px; /* Jarak huruf sedikit dirapatkan khas desain modern */
         }
+
         .input-group { 
             display: flex; 
             gap: 12px; 
@@ -62,11 +66,11 @@
         .btn-premium { 
             padding: 14px 28px; 
             background: linear-gradient(135deg, #F6F4F0, #e8e4db); 
-            color: #444; 
+            color: #000000; /* Dibuat hitam pekat agar senada */
             border: 1px solid #d6d0c4; 
             border-radius: 10px; 
             cursor: pointer; 
-            font-weight: 600;
+            font-weight: 700;
             font-size: 1rem;
             transition: all 0.3s ease;
             white-space: nowrap;
@@ -77,11 +81,10 @@
             transform: translateY(-1px);
         }
         
-        /* PEMBARUAN: Pembungkus Tabel agar bisa di-scroll di HP */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* Biar scroll-nya mulus di iPhone */
+            -webkit-overflow-scrolling: touch; 
             margin-top: 30px;
             border-radius: 10px;
         }
@@ -90,7 +93,7 @@
             width: 100%; 
             border-collapse: separate; 
             border-spacing: 0;
-            min-width: 800px; /* Memaksa tabel tetap rapi, tidak tergencet di layar kecil */
+            min-width: 800px; 
         }
         th, td { 
             padding: 16px; 
@@ -98,7 +101,8 @@
         }
         th { 
             background: linear-gradient(135deg, #F6F4F0, #fcfbf9); 
-            color: #666; 
+            color: #000000; /* Header tabel dihitamkan agar lebih bold */
+            font-weight: 700;
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -116,20 +120,20 @@
             border-radius: 8px; 
             border: 1px solid #e8e4db;
             background-color: #F6F4F0;
-            color: #444;
+            color: #000000;
+            font-weight: 600;
             outline: none;
             cursor: pointer;
         }
         .job-link { 
-            color: #444; 
+            color: #000000; 
             text-decoration: none; 
-            font-weight: 600; 
+            font-weight: 700; 
             border-bottom: 1px solid transparent;
             transition: all 0.2s;
         }
         .job-link:hover { 
-            color: #000;
-            border-bottom: 1px solid #999; 
+            border-bottom: 2px solid #000000; 
         }
         .btn-delete {
             background: transparent;
@@ -138,6 +142,7 @@
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
+            font-weight: 600;
             font-size: 0.85rem;
             transition: all 0.2s ease;
         }
@@ -148,23 +153,14 @@
         }
         #loading { color: #888; font-style: italic; font-size: 0.9em; margin-left: 5px; }
 
-        /* KODE BARU: Pengaturan khusus untuk Layar HP (Mobile) */
         @media (max-width: 768px) {
-            body { 
-                padding: 15px 10px; /* Mengurangi jarak di pinggir layar HP */
-            }
-            .container { 
-                padding: 20px; /* Mengurangi jarak di dalam kotak putih */
-            }
-            .logo {
-                height: 50px; /* Logo sedikit dikecilkan agar proporsional di HP */
-            }
-            .input-group { 
-                flex-direction: column; /* Mengubah susunan input & tombol menjadi atas-bawah */
-            }
-            .btn-premium {
-                width: 100%; /* Tombol Add Job memenuhi lebar layar */
-            }
+            body { padding: 10px; }
+            .container { padding: 20px; }
+            .logo { height: 50px; }
+            .input-group { flex-direction: column; }
+            .btn-premium { width: 100%; }
+            /* Penyesuaian font di HP agar tidak terlalu besar */
+            .off-white-subtitle { font-size: 0.95rem; } 
         }
     </style>
 </head>
@@ -173,7 +169,7 @@
 <div class="container">
     <div class="header-container">
         <img src="jacker-logo.jpg" alt="Jacker Logo" class="logo">
-        <p class="quote">"NO MATTER WHAT HAPPENED, KEEP GOING."</p>
+        <p class="off-white-subtitle">Your Go To Job Application Tracker c/o NATHANAEL SUKMANA</p>
     </div>
     
     <div class="input-group">
@@ -196,7 +192,7 @@
                 </tr>
             </thead>
             <tbody id="jobTableBody">
-                </tbody>
+            </tbody>
         </table>
     </div>
 </div>
@@ -225,15 +221,15 @@
             if (interviewStatus === 'Ditolak') interviewStatus = 'Rejected';
 
             const row = `<tr>
-                <td>${index + 1}</td>
-                <td style="color: #666; white-space: nowrap;">${job.dateApplied}</td>
+                <td><strong>${index + 1}</strong></td>
+                <td style="color: #444; white-space: nowrap;">${job.dateApplied}</td>
                 <td>
                     <a href="${jobUrl}" target="_blank" class="job-link" title="Open job posting">
                         ${job.jobTitle}
                     </a>
                 </td>
-                <td style="white-space: nowrap;">${job.company}</td>
-                <td><span style="background: #F6F4F0; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; border: 1px solid #e8e4db;">${platform}</span></td>
+                <td style="white-space: nowrap; font-weight: 500;">${job.company}</td>
+                <td><span style="background: #000000; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: bold; letter-spacing: 0.5px;">${platform}</span></td>
                 <td>
                     <select onchange="updateInterview(${index}, this.value)">
                         <option value="Pending" ${interviewStatus === 'Pending' ? 'selected' : ''}>Pending</option>
@@ -260,6 +256,13 @@
         loadingText.style.display = 'inline-block';
 
         try {
+            let platformName = "Other";
+            const urlLower = url.toLowerCase();
+            if (urlLower.includes("indeed")) platformName = "Indeed";
+            else if (urlLower.includes("linkedin")) platformName = "LinkedIn";
+            else if (urlLower.includes("stepstone")) platformName = "Stepstone";
+            else if (urlLower.includes("xing")) platformName = "Xing";
+
             const response = await fetch('/api/scrape', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -268,26 +271,24 @@
 
             const data = await response.json();
             
+            let finalJobTitle = data.jobTitle;
+            let finalCompany = data.company;
+
+            if (!response.ok || !finalJobTitle || data.error) {
+                alert(`Oops! Robot kita di server diblokir oleh keamanan ${platformName}.\nMari kita masukkan detailnya secara manual.`);
+                
+                finalJobTitle = prompt("Masukkan Job Title (Judul Pekerjaan):") || "Manual Input";
+                finalCompany = prompt("Masukkan Nama Company (Perusahaan):") || "Manual Input";
+            }
+            
             const today = new Date();
             const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth()+1).toString().padStart(2, '0')}/${today.getFullYear()}`;
-
-            let platformName = "Other";
-            const urlLower = url.toLowerCase();
-            if (urlLower.includes("indeed")) {
-                platformName = "Indeed";
-            } else if (urlLower.includes("linkedin")) {
-                platformName = "LinkedIn";
-            } else if (urlLower.includes("stepstone")) {
-                platformName = "Stepstone";
-            } else if (urlLower.includes("xing")) {
-                platformName = "Xing";
-            }
 
             jobs.push({
                 url: url,
                 dateApplied: dateStr,
-                jobTitle: data.jobTitle || "Manual Input",
-                company: data.company || "Manual Input",
+                jobTitle: finalJobTitle,
+                company: finalCompany,
                 website: platformName,
                 interview: "Pending"
             });
@@ -297,7 +298,7 @@
             urlInput.value = '';
 
         } catch (error) {
-            alert("Failed to fetch data automatically. Please check the backend connection.");
+            alert("Koneksi ke server gagal. Pastikan server berjalan.");
         } finally {
             loadingText.style.display = 'none';
         }
