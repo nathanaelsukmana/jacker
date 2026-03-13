@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; background-color: #f4f7f6; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header-container { margin-bottom: 20px; }
+        .header-container h2 { margin-bottom: 5px; }
+        .quote { font-style: italic; color: #6c757d; margin-top: 0; font-size: 0.95em; }
+        .input-group { margin-bottom: 20px; display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        select { padding: 5px; border-radius: 4px; }
+        .job-link { color: #007bff; text-decoration: none; font-weight: bold; }
+        .job-link:hover { text-decoration: underline; color: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <h2>Job Application Tracker</h2>
+        <p class="quote">"NO MATTER WHAT HAPPENED, KEEP GOING."</p>
+    </div>
+    
+    <div class="input-group">
+        <input type="text" id="jobUrl" placeholder="Paste job link here...">
+        <button onclick="addJob()">Add Job</button>
+    </div>
+    <span id="loading" style="display:none; color: #007bff;">Fetching data from link (this might take a few seconds)...</span>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Date Applied</th>
+                <th>Job Title</th>
+                <th>Company</th>
+                <th>Platform</th>
+                <th>Interview?</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="jobTableBody">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    let jobs = JSON.parse(localStorage.getItem('myJobs')) || [];
+
+    // --- KODE BARU: Mendengarkan tombol Enter ---
+    document.getElementById("jobUrl").addEventListener("keypress", function(event) {
+        // Jika tombol yang ditekan adalah Enter (baik Enter utama maupun di Numpad)
+        if (event.key === "Enter") {
+            event.preventDefault(); // Mencegah perilaku default browser
+            addJob();               // Langsung jalankan fungsi Add Job
+        }
+    });
+
+    function renderTable() {
+        const tbody = document.getElementById('jobTableBody');
+        tbody.innerHTML = '';
+        
+        jobs.forEach((job, index) => {
+            const platform = job.website || '-';
+            const jobUrl = job.url || '#';
+            
+            let interviewStatus = job.interview;
+            if (interviewStatus === 'Belum') interviewStatus = 'Pending';
+            if (interviewStatus === 'Ya') interviewStatus = 'Yes';
+            if (interviewStatus === 'Ditolak') interviewStatus = 'Rejected';
+
+            const row = `<tr>
+                <td>${index + 1}</td>
+                <td>${job.dateApplied}</td>
+                <td>
+                    <a href="${jobUrl}" target="_blank" class="job-link" title="Open job posting">
+                        ${job.jobTitle}
+                    </a>
+                </td>
+                <td>${job.company}</td>
+                <td><strong>${platform}</strong></td>
+                <td>
+                    <select onchange="updateInterview(${index}, this.value)">
+                        <option value="Pending" ${interviewStatus === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Yes" ${interviewStatus === 'Yes' ? 'selected' : ''}>Yes</option>
+                        <option value="Rejected" ${interviewStatus === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                    </select>
+                </td>
+                <td><button style="background: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;" onclick="deleteJob(${index})">Delete</button></td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    async function addJob() {
+        const urlInput = document.getElementById('jobUrl');
+        const loadingText = document.getElementById('loading');
+        const url = urlInput.value.trim();
+
+        if (!url) {
+            alert("Please enter a link first!");
+            return;
+        }
+
+        loadingText.style.display = 'inline';
+
+        try {
+            const response = await fetch('http://localhost:3000/api/scrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            });
+
+            const data = await response.json();
+            
+            const today = new Date();
+            const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth()+1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+
+            let platformName = "Other";
+            const urlLower = url.toLowerCase();
+            if (urlLower.includes("indeed")) {
+                platformName = "Indeed";
+            } else if (urlLower.includes("linkedin")) {
+                platformName = "LinkedIn";
+            } else if (urlLower.includes("stepstone")) {
+                platformName = "Stepstone";
+            } else if (urlLower.includes("xing")) {
+                platformName = "Xing";
+            }
+
+            jobs.push({
+                url: url,
+                dateApplied: dateStr,
+                jobTitle: data.jobTitle || "Manual Input",
+                company: data.company || "Manual Input",
+                website: platformName,
+                interview: "Pending"
+            });
+
+            localStorage.setItem('myJobs', JSON.stringify(jobs));
+            renderTable();
+            urlInput.value = '';
+
+        } catch (error) {
+            alert("Failed to fetch data automatically. Please check the backend connection.");
+        } finally {
+            loadingText.style.display = 'none';
+        }
+    }
+
+    function updateInterview(index, value) {
+        jobs[index].interview = value;
+        localStorage.setItem('myJobs', JSON.stringify(jobs));
+    }
+
+    function deleteJob(index) {
+        jobs.splice(index, 1);
+        localStorage.setItem('myJobs', JSON.stringify(jobs));
+        renderTable();
+    }
+
+    renderTable();
+</script>
+
+</body>
+</html>
