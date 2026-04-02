@@ -6,7 +6,6 @@
     <title>Jacker</title> 
     <style>
         body { 
-            /* Menggunakan Helvetica Neue sesuai standar Off-White */
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
             margin: 0; 
             padding: 20px; 
@@ -30,26 +29,28 @@
         .logo {
             height: 70px; 
             object-fit: contain;
-            margin-bottom: 5px; /* Jarak dirapatkan sedikit ke teks */
+            margin-bottom: 5px; 
         }
         
-        /* GAYA BARU: OFF-WHITE AESTHETIC */
         .off-white-subtitle { 
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-weight: 700; /* Bold */
-            color: #000000; /* Black pekat sesuai guidelines */
+            font-weight: 700; 
+            color: #000000; 
             margin-top: 0; 
             font-size: 1.05rem; 
-            letter-spacing: -0.3px; /* Jarak huruf sedikit dirapatkan khas desain modern */
+            letter-spacing: -0.3px; 
         }
 
+        /* PERBAIKAN: Input Group sekarang menampung 3 kolom yang responsif */
         .input-group { 
             display: flex; 
+            flex-wrap: wrap; /* Mengizinkan elemen turun ke bawah jika layar sempit */
             gap: 12px; 
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
         input[type="text"] { 
             flex: 1; 
+            min-width: 200px; /* Lebar minimal agar tidak terlalu kurus */
             padding: 14px 20px; 
             background-color: #F6F4F0;
             border: 1px solid #e8e4db; 
@@ -62,11 +63,12 @@
         input[type="text"]:focus {
             box-shadow: 0 0 0 3px rgba(246, 244, 240, 0.8);
             border-color: #d6d0c4;
+            background-color: #ffffff;
         }
         .btn-premium { 
             padding: 14px 28px; 
             background: linear-gradient(135deg, #F6F4F0, #e8e4db); 
-            color: #000000; /* Dibuat hitam pekat agar senada */
+            color: #000000; 
             border: 1px solid #d6d0c4; 
             border-radius: 10px; 
             cursor: pointer; 
@@ -85,7 +87,6 @@
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch; 
-            margin-top: 30px;
             border-radius: 10px;
         }
         
@@ -101,7 +102,7 @@
         }
         th { 
             background: linear-gradient(135deg, #F6F4F0, #fcfbf9); 
-            color: #000000; /* Header tabel dihitamkan agar lebih bold */
+            color: #000000; 
             font-weight: 700;
             font-size: 0.85rem;
             text-transform: uppercase;
@@ -151,15 +152,14 @@
             color: #d9534f;
             border-color: #d9534f;
         }
-        #loading { color: #888; font-style: italic; font-size: 0.9em; margin-left: 5px; }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 20px; }
             .logo { height: 50px; }
             .input-group { flex-direction: column; }
+            input[type="text"] { width: 100%; box-sizing: border-box; }
             .btn-premium { width: 100%; }
-            /* Penyesuaian font di HP agar tidak terlalu besar */
             .off-white-subtitle { font-size: 0.95rem; } 
         }
     </style>
@@ -168,15 +168,16 @@
 
 <div class="container">
     <div class="header-container">
-        <img src="jacker-logo.jpg" alt="Jacker Logo" class="logo">
+        <img src="logo.jpg" alt="Jacker Logo" class="logo">
         <p class="off-white-subtitle">Your Go To Job Application Tracker c/o NATHANAEL SUKMANA</p>
     </div>
     
-    <div class="input-group">
-        <input type="text" id="jobUrl" placeholder="Paste job link here...">
+    <div class="input-group" id="formGroup">
+        <input type="text" id="jobUrl" placeholder="1. Paste link...">
+        <input type="text" id="jobTitle" placeholder="2. Job Title...">
+        <input type="text" id="jobCompany" placeholder="3. Company...">
         <button class="btn-premium" onclick="addJob()">Add Job</button>
     </div>
-    <span id="loading" style="display:none;">Fetching data from link (this might take a few seconds)...</span>
 
     <div class="table-responsive">
         <table>
@@ -200,7 +201,8 @@
 <script>
     let jobs = JSON.parse(localStorage.getItem('myJobs')) || [];
 
-    document.getElementById("jobUrl").addEventListener("keypress", function(event) {
+    // Deteksi tombol Enter di semua kolom input
+    document.getElementById("formGroup").addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
             addJob();
@@ -243,65 +245,56 @@
         });
     }
 
-    async function addJob() {
+    function addJob() {
+        // Ambil nilai dari ketiga input
         const urlInput = document.getElementById('jobUrl');
-        const loadingText = document.getElementById('loading');
-        const url = urlInput.value.trim();
+        const titleInput = document.getElementById('jobTitle');
+        const companyInput = document.getElementById('jobCompany');
 
-        if (!url) {
-            alert("Please enter a link first!");
+        const url = urlInput.value.trim();
+        const title = titleInput.value.trim();
+        const company = companyInput.value.trim();
+
+        // Validasi agar tidak ada yang kosong
+        if (!url || !title || !company) {
+            alert("Please fill in the Link, Job Title, and Company first!");
             return;
         }
 
-        loadingText.style.display = 'inline-block';
+        // Auto-detect platform dari URL
+        let platformName = "Other";
+        const urlLower = url.toLowerCase();
+        if (urlLower.includes("indeed")) platformName = "Indeed";
+        else if (urlLower.includes("linkedin")) platformName = "LinkedIn";
+        else if (urlLower.includes("stepstone")) platformName = "Stepstone";
+        else if (urlLower.includes("xing")) platformName = "Xing";
+        else if (urlLower.includes("glassdoor")) platformName = "Glassdoor";
+        
+        // Format tanggal hari ini
+        const today = new Date();
+        const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth()+1).toString().padStart(2, '0')}/${today.getFullYear()}`;
 
-        try {
-            let platformName = "Other";
-            const urlLower = url.toLowerCase();
-            if (urlLower.includes("indeed")) platformName = "Indeed";
-            else if (urlLower.includes("linkedin")) platformName = "LinkedIn";
-            else if (urlLower.includes("stepstone")) platformName = "Stepstone";
-            else if (urlLower.includes("xing")) platformName = "Xing";
+        // Masukkan data ke memori secara INSTAN
+        jobs.push({
+            url: url,
+            dateApplied: dateStr,
+            jobTitle: title,
+            company: company,
+            website: platformName,
+            interview: "Pending"
+        });
 
-            const response = await fetch('/api/scrape', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: url })
-            });
+        // Simpan dan Render
+        localStorage.setItem('myJobs', JSON.stringify(jobs));
+        renderTable();
 
-            const data = await response.json();
-            
-            let finalJobTitle = data.jobTitle;
-            let finalCompany = data.company;
-
-            if (!response.ok || !finalJobTitle || data.error) {
-                alert(`Oops! Robot kita di server diblokir oleh keamanan ${platformName}.\nMari kita masukkan detailnya secara manual.`);
-                
-                finalJobTitle = prompt("Masukkan Job Title (Judul Pekerjaan):") || "Manual Input";
-                finalCompany = prompt("Masukkan Nama Company (Perusahaan):") || "Manual Input";
-            }
-            
-            const today = new Date();
-            const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth()+1).toString().padStart(2, '0')}/${today.getFullYear()}`;
-
-            jobs.push({
-                url: url,
-                dateApplied: dateStr,
-                jobTitle: finalJobTitle,
-                company: finalCompany,
-                website: platformName,
-                interview: "Pending"
-            });
-
-            localStorage.setItem('myJobs', JSON.stringify(jobs));
-            renderTable();
-            urlInput.value = '';
-
-        } catch (error) {
-            alert("Koneksi ke server gagal. Pastikan server berjalan.");
-        } finally {
-            loadingText.style.display = 'none';
-        }
+        // Kosongkan kolom input setelah berhasil
+        urlInput.value = '';
+        titleInput.value = '';
+        companyInput.value = '';
+        
+        // Fokuskan kembali kursor ke kolom URL untuk lamaran berikutnya
+        urlInput.focus();
     }
 
     function updateInterview(index, value) {
